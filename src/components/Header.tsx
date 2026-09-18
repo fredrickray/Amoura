@@ -42,14 +42,19 @@ export function Header() {
         <Link
           href="/"
           aria-label="Amoura home"
-          className="relative z-10 flex size-9 items-center justify-center rounded-[10px] bg-ink text-white transition-transform duration-160 ease-[var(--ease-out-strong)] active:scale-[0.97]"
+          className="relative z-10 flex items-center gap-2.5 transition-transform duration-160 ease-[var(--ease-out-strong)] active:scale-[0.98]"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-            <path
-              d="M8 1.5C5.2 4.1 3.5 6.4 3.5 8.7a4.5 4.5 0 0 0 9 0C12.5 6.4 10.8 4.1 8 1.5Z"
-              fill="currentColor"
-            />
-          </svg>
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-ink text-white">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path
+                d="M8 1.5C5.2 4.1 3.5 6.4 3.5 8.7a4.5 4.5 0 0 0 9 0C12.5 6.4 10.8 4.1 8 1.5Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+          <span className="font-script text-[2rem] leading-none text-blush-deep md:text-[2.15rem]">
+            Amoura
+          </span>
         </Link>
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex">
