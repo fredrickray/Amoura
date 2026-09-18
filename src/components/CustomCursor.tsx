@@ -72,8 +72,8 @@ export function CustomCursor() {
       <motion.div
         className="-translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
         animate={{
-          width: hovering ? 44 : 10,
-          height: hovering ? 44 : 10,
+          width: hovering ? 28 : 10,
+          height: hovering ? 28 : 10,
         }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
       />
