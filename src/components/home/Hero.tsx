@@ -116,18 +116,17 @@ export function Hero() {
                 }
           }
         >
-          <div className="relative h-[58vh] w-[min(420px,78vw)] md:h-[70vh]">
-            <div className="product-mask absolute inset-0">
-              <Image
-                src="/hero/bottle.png"
-                alt="Amoura signature perfume"
-                fill
-                priority
-                className="object-contain object-bottom drop-shadow-[0_24px_50px_rgba(0,0,0,0.1)]"
-                sizes="(max-width: 768px) 78vw, 420px"
-              />
-            </div>
-            <span className="hotspot absolute left-1/2 top-[12%] size-2.5 -translate-x-1/2 rounded-full bg-ink" />
+          <div className="relative h-[62vh] w-[min(280px,55vw)] md:h-[72vh] md:w-[min(320px,40vw)]">
+            <Image
+              src="/hero/bottle.png"
+              alt="Amoura signature perfume"
+              fill
+              priority
+              unoptimized
+              className="object-contain object-bottom drop-shadow-[0_28px_60px_rgba(0,0,0,0.18)]"
+              sizes="(max-width: 768px) 55vw, 320px"
+            />
+            <span className="hotspot absolute left-1/2 top-[8%] size-2.5 -translate-x-1/2 rounded-full bg-ink" />
           </div>
         </motion.div>
 

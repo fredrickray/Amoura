@@ -26,20 +26,23 @@ export function Footer() {
     <footer className="border-t border-line bg-[#111] text-white">
       <div className="mx-auto grid max-w-[1240px] gap-12 px-5 py-16 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:px-8 md:py-20">
         <div>
-          <div className="mb-5 flex size-10 items-center justify-center rounded-[10px] bg-white text-ink">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <path
-                d="M8 1.5C5.2 4.1 3.5 6.4 3.5 8.7a4.5 4.5 0 0 0 9 0C12.5 6.4 10.8 4.1 8 1.5Z"
-                fill="currentColor"
-              />
-            </svg>
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-[10px] bg-white text-ink">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                <path
+                  d="M8 1.5C5.2 4.1 3.5 6.4 3.5 8.7a4.5 4.5 0 0 0 9 0C12.5 6.4 10.8 4.1 8 1.5Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <span className="font-script text-[2.4rem] leading-none text-blush">Amoura</span>
           </div>
           <p className="max-w-xs text-[15px] leading-relaxed text-white/65">
             Amoura crafts perfumes, custom magazines, and lash experiences for
             people who want beauty that feels personal.
           </p>
-          <p className="mt-10 font-display text-5xl tracking-tight text-white/90 md:text-6xl">
-            AMOURA
+          <p className="mt-10 font-script text-6xl leading-none text-blush md:text-7xl">
+            Amoura
           </p>
         </div>
 

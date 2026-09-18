@@ -9,8 +9,11 @@
   --color-surface: #ffffff;
   --color-surface-soft: #efefef;
   --color-star: #e24a3b;
+  --color-blush: #c9a3a8;
+  --color-blush-deep: #a87e86;
   --font-display: var(--font-instrument), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
+  --font-script: var(--font-great-vibes), "Great Vibes", cursive;
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-inout: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -41,6 +44,13 @@ a {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.02em;
+}
+
+.font-script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .pill {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Manrope } from "next/font/google";
+import { Great_Vibes, Instrument_Serif, Manrope } from "next/font/google";
 import { CustomCursor } from "@/components/CustomCursor";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -18,6 +18,13 @@ const instrument = Instrument_Serif({
   display: "swap",
 });
 
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-great-vibes",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Amoura — Perfumes, Magazines & Lashes",
@@ -33,7 +40,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${instrument.variable}`}>
+    <html
+      lang="en"
+      className={`${manrope.variable} ${instrument.variable} ${greatVibes.variable}`}
+    >
       <body
         className="min-h-screen bg-canvas antialiased"
         style={{ fontFamily: "var(--font-manrope), Helvetica Neue, Arial, sans-serif" }}
