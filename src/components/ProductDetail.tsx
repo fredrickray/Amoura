@@ -9,6 +9,7 @@ import { ProductImageGallery } from "@/components/ProductImageGallery";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Reveal } from "@/components/Reveal";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { getReviewsForProduct } from "@/data/account";
 import {
   catalogueLabels,
@@ -35,11 +36,13 @@ const accordion = [
 export function ProductDetail({ product }: { product: Product }) {
   const router = useRouter();
   const { addItem } = useCart();
+  const { has, toggle } = useWishlist();
   const [openAcc, setOpenAcc] = useState<number | null>(null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const related = getRelated(product.slug, 3);
   const reviews = getReviewsForProduct(product.slug);
+  const saved = has(product.slug);
 
   const gallery =
     product.gallery.length >= 4
@@ -160,6 +163,17 @@ export function ProductDetail({ product }: { product: Product }) {
                   className="pill flex-1 justify-center py-3.5 text-[15px]"
                 >
                   {added ? "Added to cart" : "Add to cart"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggle(product.slug)}
+                  aria-pressed={saved}
+                  className={cn(
+                    "pill justify-center px-4 py-3.5 text-[15px] sm:px-5",
+                    saved && "border-star text-star",
+                  )}
+                >
+                  {saved ? "Saved" : "Save"}
                 </button>
               </div>
 

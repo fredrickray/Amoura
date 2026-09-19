@@ -8,7 +8,8 @@ import { motion } from "framer-motion";
 import type { Product } from "@/data/catalog";
 import { catalogueLabels } from "@/data/catalog";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/lib/utils";
+import { useWishlist } from "@/context/WishlistContext";
+import { cn, formatPrice } from "@/lib/utils";
 
 export function ProductCard({
   product,
@@ -19,7 +20,9 @@ export function ProductCard({
 }) {
   const router = useRouter();
   const { addItem } = useCart();
+  const { has, toggle } = useWishlist();
   const [added, setAdded] = useState(false);
+  const saved = has(product.slug);
 
   function stop(e: React.MouseEvent) {
     e.preventDefault();
@@ -39,6 +42,11 @@ export function ProductCard({
     router.push("/cart");
   }
 
+  function onWish(e: React.MouseEvent) {
+    stop(e);
+    toggle(product.slug);
+  }
+
   return (
     <div className="group">
       <Link href={`/product/${product.slug}`} className="block cursor-hover">
@@ -52,6 +60,26 @@ export function ProductCard({
               className="product-card-image size-full object-cover"
             />
           </div>
+
+          <button
+            type="button"
+            onClick={onWish}
+            aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+            aria-pressed={saved}
+            className={cn(
+              "absolute right-3 top-3 z-10 flex size-10 items-center justify-center rounded-full bg-white/95 shadow-sm transition-transform active:scale-95",
+              saved ? "text-star" : "text-ink-soft hover:text-ink",
+            )}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} aria-hidden>
+              <path
+                d="M12 20s-7-4.35-7-9.2A3.8 3.8 0 0 1 12 7.5a3.8 3.8 0 0 1 7 3.3C19 15.65 12 20 12 20Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
 
           {/* Quick actions — no need to open the product page */}
           <div className="absolute inset-x-3 bottom-3 z-10 flex gap-2 opacity-100 transition-opacity duration-250 sm:opacity-0 sm:group-hover:opacity-100">
