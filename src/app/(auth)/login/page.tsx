@@ -17,7 +17,7 @@ export default function LoginPage() {
     <AuthShell
       title="Welcome back"
       subtitle="Sign in to continue shopping, booking lashes, or managing your magazine orders."
-      imageSrc="https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1400&q=80"
+      imageSrc="/products/lum-parfum.png"
       imageAlt="Amoura perfume bottle"
       imageCaption="Your atelier of scent, story, and lashes — waiting for you."
     >
