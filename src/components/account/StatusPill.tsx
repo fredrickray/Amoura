@@ -42,3 +42,17 @@ export function appointmentTone(
   if (status === "completed") return "success" as const;
   return "danger" as const;
 }
+
+export function magazineTone(
+  status:
+    | "draft"
+    | "in_review"
+    | "changes_requested"
+    | "approved"
+    | "printed",
+) {
+  if (status === "printed" || status === "approved") return "success" as const;
+  if (status === "in_review" || status === "changes_requested")
+    return "warning" as const;
+  return "neutral" as const;
+}

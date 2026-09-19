@@ -5,12 +5,15 @@ import {
   appointmentStatusLabel,
   appointments,
   customer,
+  magazineProjects,
+  magazineStatusLabel,
   orderStatusLabel,
   orders,
 } from "@/data/account";
 import {
   StatusPill,
   appointmentTone,
+  magazineTone,
   orderTone,
 } from "@/components/account/StatusPill";
 import { PillButton } from "@/components/PillButton";
@@ -34,9 +37,9 @@ const quickActions = [
     image: "/methods/soft-volume.png",
   },
   {
-    href: "/magazines",
-    label: "Custom magazine",
-    hint: "Start a project",
+    href: "/account/magazines",
+    label: "Magazine projects",
+    hint: "Proofs & drafts",
     image:
       "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=600&q=80",
   },
@@ -45,6 +48,7 @@ const quickActions = [
 export default function AccountHomePage() {
   const latestOrder = orders[0];
   const nextAppointment = appointments.find((a) => a.status === "upcoming");
+  const activeMagazine = magazineProjects.find((p) => p.status !== "printed");
 
   return (
     <div>
@@ -219,6 +223,53 @@ export default function AccountHomePage() {
           )}
         </section>
       </div>
+
+      {activeMagazine ? (
+        <section className="mt-6 overflow-hidden rounded-[24px] border border-line/80 bg-surface/90 shadow-[0_18px_40px_-32px_rgba(17,17,17,0.35)]">
+          <div className="flex items-center justify-between gap-3 border-b border-line/70 px-5 py-4 md:px-6">
+            <h2 className="font-display text-2xl tracking-tight">
+              Magazine in progress
+            </h2>
+            <Link
+              href="/account/magazines"
+              className="text-sm font-medium text-ink-soft hover:text-ink"
+            >
+              View all
+            </Link>
+          </div>
+          <Link
+            href={`/account/magazines/${activeMagazine.id}`}
+            className="flex flex-col gap-4 p-5 transition-colors hover:bg-[#faf6f6] sm:flex-row sm:items-center md:p-6"
+          >
+            <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-2xl bg-surface-soft sm:h-24 sm:w-36">
+              <Image
+                src={activeMagazine.coverImage}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="144px"
+                unoptimized={activeMagazine.coverImage.startsWith("/")}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <p className="font-medium text-ink">{activeMagazine.title}</p>
+                <StatusPill tone={magazineTone(activeMagazine.status)}>
+                  {magazineStatusLabel[activeMagazine.status]}
+                </StatusPill>
+              </div>
+              <p className="mt-2 text-sm text-ink-soft">
+                {activeMagazine.theme} · {activeMagazine.pages} pages
+              </p>
+              <p className="mt-1 text-sm text-ink-muted">
+                {activeMagazine.status === "in_review"
+                  ? "Proof ready — review and approve to print"
+                  : `Updated ${activeMagazine.updatedAt}`}
+              </p>
+            </div>
+          </Link>
+        </section>
+      ) : null}
     </div>
   );
 }
