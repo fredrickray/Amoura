@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   AuthDivider,
@@ -11,6 +12,7 @@ import {
 import { AuthShell } from "@/components/auth/AuthShell";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -25,6 +27,7 @@ export default function LoginPage() {
         className="flex flex-col gap-4"
         onSubmit={(e) => {
           e.preventDefault();
+          router.push("/account");
         }}
       >
         <AuthInput
@@ -76,7 +79,7 @@ export default function LoginPage() {
 
       <div className="mt-6 flex flex-col gap-4">
         <AuthDivider />
-        <AuthSocialButtons />
+        <AuthSocialButtons onContinue={() => router.push("/account")} />
       </div>
 
       <p className="mt-8 text-center text-sm text-ink-soft">

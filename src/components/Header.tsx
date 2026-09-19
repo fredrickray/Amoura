@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
 import { PillButton } from "./PillButton";
 
@@ -15,6 +16,7 @@ const links = [
 
 export function Header() {
   const pathname = usePathname();
+  const { count } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -59,7 +61,8 @@ export function Header() {
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex">
           {links.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            const active =
+              pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
               <Link
                 key={link.href}
@@ -77,6 +80,31 @@ export function Header() {
 
         <div className="relative z-10 flex items-center gap-2 sm:gap-3">
           <Link
+            href="/cart"
+            aria-label={`Cart${count ? `, ${count} items` : ""}`}
+            className="relative inline-flex size-10 items-center justify-center rounded-full border border-ink/15 transition-colors hover:bg-surface-soft"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M6 7h12l-1 12H7L6 7Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 7V5.5a3 3 0 0 1 6 0V7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            {count > 0 ? (
+              <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-semibold text-white">
+                {count > 9 ? "9+" : count}
+              </span>
+            ) : null}
+          </Link>
+          <Link
             href="/login"
             className="hidden text-[15px] text-ink-soft transition-colors hover:text-ink sm:inline"
           >
@@ -84,9 +112,6 @@ export function Header() {
           </Link>
           <PillButton href="/signup" className="hidden sm:inline-flex" arrow>
             Join
-          </PillButton>
-          <PillButton href="/store" className="hidden md:inline-flex" arrow>
-            Shop
           </PillButton>
           <button
             type="button"
@@ -117,7 +142,7 @@ export function Header() {
       <div
         className={cn(
           "overflow-hidden border-t border-line bg-canvas transition-[max-height,opacity] duration-300 ease-[var(--ease-out-strong)] md:hidden",
-          open ? "max-h-64 opacity-100" : "max-h-0 opacity-0",
+          open ? "max-h-72 opacity-100" : "max-h-0 opacity-0",
         )}
       >
         <div className="flex flex-col gap-1 px-5 py-4">
@@ -131,6 +156,12 @@ export function Header() {
             </Link>
           ))}
           <Link
+            href="/cart"
+            className="rounded-xl px-3 py-3 text-[15px] text-ink-soft hover:bg-surface-soft hover:text-ink"
+          >
+            Cart{count > 0 ? ` (${count})` : ""}
+          </Link>
+          <Link
             href="/login"
             className="rounded-xl px-3 py-3 text-[15px] text-ink-soft hover:bg-surface-soft hover:text-ink"
           >
@@ -138,9 +169,6 @@ export function Header() {
           </Link>
           <PillButton href="/signup" className="mt-2 w-full" arrow>
             Join
-          </PillButton>
-          <PillButton href="/store" className="w-full" arrow>
-            Shop
           </PillButton>
         </div>
       </div>

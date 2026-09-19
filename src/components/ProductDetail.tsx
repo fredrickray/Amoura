@@ -1,12 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProductCardMotion } from "@/components/ProductCard";
-import { PillButton } from "@/components/PillButton";
+import { ProductImageGallery } from "@/components/ProductImageGallery";
+import { ProductReviews } from "@/components/ProductReviews";
 import { Reveal } from "@/components/Reveal";
+import { useCart } from "@/context/CartContext";
+import { getReviewsForProduct } from "@/data/account";
 import {
   catalogueLabels,
   getRelated,
@@ -30,12 +33,38 @@ const accordion = [
 ];
 
 export function ProductDetail({ product }: { product: Product }) {
+  const router = useRouter();
+  const { addItem } = useCart();
   const [openAcc, setOpenAcc] = useState<number | null>(null);
-  const related = getRelated(product.slug);
+  const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
+  const related = getRelated(product.slug, 3);
+  const reviews = getReviewsForProduct(product.slug);
+
+  const gallery =
+    product.gallery.length >= 4
+      ? product.gallery
+      : [
+          ...product.gallery,
+          "https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=900&q=80",
+          "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=900&q=80",
+          "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80",
+        ].filter((v, i, a) => a.indexOf(v) === i);
+
+  function handleAdd() {
+    addItem(product, qty);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1800);
+  }
+
+  function handleBuyNow() {
+    addItem(product, qty);
+    router.push("/cart");
+  }
 
   return (
     <div className="px-5 pb-24 pt-8 md:px-8 md:pt-12">
-      <div className="mx-auto max-w-[1240px]">
+      <div className="mx-auto max-w-[1240px] min-w-0">
         <div className="mb-6 text-sm text-ink-muted">
           <Link href="/store" className="hover:text-ink">
             Store
@@ -44,39 +73,12 @@ export function ProductDetail({ product }: { product: Product }) {
           <span>{catalogueLabels[product.catalogue]}</span>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-          <Reveal>
-            <div className="grid grid-cols-[1.4fr_0.7fr] gap-3 md:gap-4">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-[22px] bg-surface-soft">
-                <Image
-                  src={product.gallery[0]}
-                  alt={product.name}
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 70vw, 520px"
-                />
-              </div>
-              <div className="grid gap-3 md:gap-4">
-                {product.gallery.slice(1, 3).map((src) => (
-                  <div
-                    key={src}
-                    className="relative aspect-square overflow-hidden rounded-[18px] bg-surface-soft"
-                  >
-                    <Image
-                      src={src}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="200px"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="grid min-w-0 gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+          <Reveal className="min-w-0">
+            <ProductImageGallery images={gallery} alt={product.name} />
           </Reveal>
 
-          <Reveal delay={0.1}>
+          <Reveal delay={0.08} className="min-w-0">
             <div>
               <h1 className="font-display text-4xl tracking-tight md:text-5xl">
                 {product.name}
@@ -86,7 +88,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <span className="text-star">★</span>
                 <span className="font-medium">
-                  {product.rating.toFixed(1)} ({product.reviews})
+                  {product.rating.toFixed(1)} ({product.reviews} reviews)
                 </span>
               </div>
 
@@ -119,7 +121,49 @@ export function ProductDetail({ product }: { product: Product }) {
                 ))}
               </ul>
 
-              <div className="mt-4 divide-y divide-line border-y border-line">
+              <div className="mt-8 flex items-center gap-3">
+                <p className="text-sm font-medium">Qty</p>
+                <div className="inline-flex items-center rounded-full border border-line bg-surface">
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    className="flex size-10 items-center justify-center text-lg text-ink-soft hover:text-ink"
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  >
+                    −
+                  </button>
+                  <span className="min-w-8 text-center text-sm font-medium">
+                    {qty}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Increase quantity"
+                    className="flex size-10 items-center justify-center text-lg text-ink-soft hover:text-ink"
+                    onClick={() => setQty((q) => q + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="pill pill-solid flex-1 justify-center py-3.5 text-[15px]"
+                >
+                  Buy now
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  className="pill flex-1 justify-center py-3.5 text-[15px]"
+                >
+                  {added ? "Added to cart" : "Add to cart"}
+                </button>
+              </div>
+
+              <div className="mt-6 divide-y divide-line border-y border-line">
                 {accordion.map((item, index) => {
                   const isOpen = openAcc === index;
                   return (
@@ -161,38 +205,19 @@ export function ProductDetail({ product }: { product: Product }) {
                   );
                 })}
               </div>
-
-              <div className="mt-8">
-                <PillButton
-                  href="/support"
-                  variant="solid"
-                  className="w-full sm:w-auto"
-                >
-                  Available Here
-                </PillButton>
-              </div>
             </div>
           </Reveal>
         </div>
 
-        <section className="mt-24">
-          <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="badge mb-4">Similar items</p>
-              <h2 className="font-display text-[clamp(2rem,4vw,3.25rem)] leading-[1.05] tracking-[-0.03em]">
-                <span className="block text-ink">Similar Items</span>
-                <span className="block text-ink-soft/80">You Might Like</span>
-              </h2>
-            </div>
-            <PillButton href="/store" variant="solid">
-              View All
-            </PillButton>
-          </div>
+        <ProductReviews reviews={reviews} />
 
-          <div className="mb-6 flex justify-center">
-            <span className="size-1.5 rounded-full bg-ink" />
+        <section className="mt-20">
+          <div className="mb-8">
+            <p className="badge mb-3">You might also like</p>
+            <h2 className="font-display text-[clamp(1.85rem,3.5vw,2.75rem)] tracking-tight">
+              Related products
+            </h2>
           </div>
-
           <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((item, i) => (
               <ProductCardMotion key={item.slug} product={item} index={i} />
