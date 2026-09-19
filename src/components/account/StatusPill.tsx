@@ -56,3 +56,9 @@ export function magazineTone(
     return "warning" as const;
   return "neutral" as const;
 }
+
+export function supportTone(status: "open" | "awaiting_you" | "resolved") {
+  if (status === "resolved") return "success" as const;
+  if (status === "awaiting_you") return "warning" as const;
+  return "neutral" as const;
+}

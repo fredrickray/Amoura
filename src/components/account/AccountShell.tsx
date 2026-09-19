@@ -10,6 +10,10 @@ const nav = [
   { href: "/account/orders", label: "Orders" },
   { href: "/account/appointments", label: "Appointments" },
   { href: "/account/magazines", label: "Magazines" },
+  { href: "/account/wishlist", label: "Wishlist" },
+  { href: "/account/addresses", label: "Addresses" },
+  { href: "/account/support", label: "Support" },
+  { href: "/account/notifications", label: "Alerts" },
   { href: "/account/profile", label: "Profile" },
 ];
 
@@ -53,7 +57,28 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/account/notifications"
+              aria-label="Notifications"
+              className="relative flex size-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-surface-soft hover:text-ink"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M6 9a6 6 0 1 1 12 0c0 3.5 1.5 5 1.5 5H4.5S6 12.5 6 9Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M10 18a2 2 0 0 0 4 0"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-star" />
+            </Link>
             <Link
               href="/store"
               className="hidden text-sm text-ink-soft transition-colors hover:text-ink sm:inline"

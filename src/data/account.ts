@@ -451,3 +451,190 @@ export const magazineProjects: MagazineProject[] = [
 export function getMagazineProject(id: string) {
   return magazineProjects.find((p) => p.id === id);
 }
+
+export type Address = {
+  id: string;
+  label: string;
+  name: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
+};
+
+export type SupportTicketStatus = "open" | "awaiting_you" | "resolved";
+
+export type SupportMessage = {
+  id: string;
+  from: "you" | "amoura";
+  body: string;
+  at: string;
+};
+
+export type SupportTicket = {
+  id: string;
+  subject: string;
+  status: SupportTicketStatus;
+  relatedTo?: string;
+  updatedAt: string;
+  messages: SupportMessage[];
+};
+
+export type NotificationKind =
+  | "order"
+  | "appointment"
+  | "magazine"
+  | "promo";
+
+export type AccountNotification = {
+  id: string;
+  kind: NotificationKind;
+  title: string;
+  body: string;
+  at: string;
+  href: string;
+  read: boolean;
+};
+
+export const addresses: Address[] = [
+  {
+    id: "addr-1",
+    label: "Home",
+    name: "Ada Okoye",
+    line1: "14 Admiralty Way",
+    line2: "Lekki Phase 1",
+    city: "Lagos",
+    state: "Lagos",
+    country: "Nigeria",
+    phone: "+234 801 234 5678",
+    isDefault: true,
+  },
+  {
+    id: "addr-2",
+    label: "Office",
+    name: "Ada Okoye",
+    line1: "12B Adeola Odeku Street",
+    line2: "Victoria Island",
+    city: "Lagos",
+    state: "Lagos",
+    country: "Nigeria",
+    phone: "+234 801 234 5678",
+    isDefault: false,
+  },
+];
+
+export const supportTickets: SupportTicket[] = [
+  {
+    id: "SUP-882",
+    subject: "Tracking for AMO-10428",
+    status: "awaiting_you",
+    relatedTo: "Order AMO-10428",
+    updatedAt: "18 Sep · 2:14 PM",
+    messages: [
+      {
+        id: "m1",
+        from: "you",
+        body: "Hi — my Lum Noir order shows shipped. Can you confirm the courier and ETA for Lekki?",
+        at: "17 Sep · 11:02 AM",
+      },
+      {
+        id: "m2",
+        from: "amoura",
+        body: "Hello Ada — it’s with GIG Logistics, tracking NG-AMO-778291. Est. delivery 20 Sep. Reply if you’d like a weekend drop window.",
+        at: "18 Sep · 2:14 PM",
+      },
+    ],
+  },
+  {
+    id: "SUP-841",
+    subject: "Magazine proof crop on cover",
+    status: "resolved",
+    relatedTo: "Project MAG-318",
+    updatedAt: "14 Sep · 5:40 PM",
+    messages: [
+      {
+        id: "m1",
+        from: "you",
+        body: "Could we soften the cover crop so more of the dress shows?",
+        at: "13 Sep · 9:18 AM",
+      },
+      {
+        id: "m2",
+        from: "amoura",
+        body: "Done — proof v2 reflects a wider crop. Please review in your magazine project.",
+        at: "14 Sep · 5:40 PM",
+      },
+    ],
+  },
+  {
+    id: "SUP-790",
+    subject: "Lash fill availability",
+    status: "open",
+    relatedTo: "Appointment APT-2201",
+    updatedAt: "12 Sep · 10:05 AM",
+    messages: [
+      {
+        id: "m1",
+        from: "you",
+        body: "Can I add a fill two weeks after my Silk Lash set with Chioma?",
+        at: "12 Sep · 10:05 AM",
+      },
+    ],
+  },
+];
+
+export const notifications: AccountNotification[] = [
+  {
+    id: "n1",
+    kind: "order",
+    title: "Order AMO-10428 is on the way",
+    body: "Lum Noir left the atelier. Tracking NG-AMO-778291.",
+    at: "15 Sep · 4:02 PM",
+    href: "/account/orders/AMO-10428",
+    read: false,
+  },
+  {
+    id: "n2",
+    kind: "magazine",
+    title: "Proof ready for MAG-318",
+    body: "Your engagement edit proof is waiting for approval.",
+    at: "18 Sep · 11:30 AM",
+    href: "/account/magazines/MAG-318",
+    read: false,
+  },
+  {
+    id: "n3",
+    kind: "appointment",
+    title: "Reminder: lash set on 24 Sep",
+    body: "Silk Lash Set with Chioma B. at 11:00 AM.",
+    at: "19 Sep · 8:00 AM",
+    href: "/account/appointments/APT-2201",
+    read: true,
+  },
+  {
+    id: "n4",
+    kind: "promo",
+    title: "AMOURA10 for your next scent",
+    body: "10% off perfume orders this week — use code AMOURA10 at checkout.",
+    at: "16 Sep · 9:00 AM",
+    href: "/store",
+    read: true,
+  },
+];
+
+export const supportStatusLabel: Record<SupportTicketStatus, string> = {
+  open: "Open",
+  awaiting_you: "Awaiting you",
+  resolved: "Resolved",
+};
+
+export function getSupportTicket(id: string) {
+  return supportTickets.find((t) => t.id === id);
+}
+
+export function getAddress(id: string) {
+  return addresses.find((a) => a.id === id);
+}
