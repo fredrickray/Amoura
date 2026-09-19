@@ -44,8 +44,7 @@ const pillars = [
     cards: [
       {
         title: "Soft volume",
-        image:
-          "https://images.unsplash.com/photo-1522335789203-aabdacfda204?auto=format&fit=crop&w=600&q=80",
+        image: "/methods/soft-volume.png",
       },
       {
         title: "Studio finish",

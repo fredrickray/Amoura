@@ -21,8 +21,11 @@ export default function SupportPage() {
             bookings — reach the atelier and we&apos;ll guide you.
           </p>
         </Reveal>
-        <Reveal delay={0.1} className="mt-8 flex justify-center">
-          <PillButton href="mailto:hello@amoura.studio" variant="solid" external>
+        <Reveal delay={0.1} className="mt-8 flex justify-center gap-3">
+          <PillButton href="/contact" variant="solid">
+            Get in touch
+          </PillButton>
+          <PillButton href="mailto:hello@amoura.studio" variant="ghost" external>
             Email Amoura
           </PillButton>
         </Reveal>

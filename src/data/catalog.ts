@@ -128,7 +128,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?auto=format&fit=crop&w=900&q=80",
     gallery: [
       "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?auto=format&fit=crop&w=900&q=80",
-      "https://images.unsplash.com/photo-1522335789203-aabdacfda204?auto=format&fit=crop&w=600&q=80",
+      "/methods/soft-volume.png",
       "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80",
     ],
   },
@@ -164,6 +164,10 @@ export const catalogueLabels: Record<Catalogue, string> = {
 
 export function getProduct(slug: string) {
   return products.find((p) => p.slug === slug);
+}
+
+export function getByCatalogue(catalogue: Catalogue) {
+  return products.filter((p) => p.catalogue === catalogue);
 }
 
 export function getRelated(slug: string, limit = 3) {
@@ -202,8 +206,7 @@ export const blogPosts = [
     excerpt:
       "Simple habits that keep extensions soft, clean, and camera-ready between appointments.",
     readTime: "6 min read",
-    image:
-      "https://images.unsplash.com/photo-1522335789203-aabdacfda204?auto=format&fit=crop&w=800&q=80",
+    image: "/methods/soft-volume.png",
   },
   {
     slug: "atelier-rituals",
