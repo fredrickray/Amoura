@@ -10,7 +10,8 @@ import { formatPrice } from "@/lib/utils";
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, count, subtotal, setQuantity, removeItem } = useCart();
+  const { items, count, subtotal, setQuantity, removeItem, magazineBalanceDue, hasMagazineDeposit } =
+    useCart();
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
   const [promo, setPromo] = useState("");
@@ -103,9 +104,12 @@ export default function CartPage() {
             <div className="flex flex-col gap-3">
               {items.map((item) => {
                 const product = getProduct(item.slug);
-                const variant = product
-                  ? `${product.size}`
-                  : "Standard";
+                const isMagazine = item.kind === "magazine";
+                const variant = isMagazine
+                  ? `${item.magazine?.pages ?? 0} pages · 50% deposit`
+                  : product
+                    ? product.size
+                    : "Standard";
                 return (
                   <article
                     key={item.slug}
@@ -121,57 +125,93 @@ export default function CartPage() {
                     </button>
 
                     <div className="flex gap-3.5 pr-8">
-                      <Link
-                        href={`/product/${item.slug}`}
-                        className="relative size-[88px] shrink-0 overflow-hidden rounded-2xl bg-[#efefef] md:size-[100px]"
-                      >
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-contain p-2"
-                          sizes="100px"
-                          unoptimized={item.image.startsWith("/")}
-                        />
-                      </Link>
-
-                      <div className="min-w-0 flex-1">
+                      {isMagazine ? (
+                        <div className="relative size-[88px] shrink-0 overflow-hidden rounded-2xl bg-[#efefef] md:size-[100px]">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="100px"
+                            unoptimized={item.image.startsWith("blob:") || item.image.startsWith("/")}
+                          />
+                        </div>
+                      ) : (
                         <Link
                           href={`/product/${item.slug}`}
-                          className="block text-[15px] font-semibold leading-snug tracking-tight text-ink hover:underline"
+                          className="relative size-[88px] shrink-0 overflow-hidden rounded-2xl bg-[#efefef] md:size-[100px]"
                         >
-                          {item.name}
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-contain p-2"
+                            sizes="100px"
+                            unoptimized={item.image.startsWith("/")}
+                          />
                         </Link>
+                      )}
+
+                      <div className="min-w-0 flex-1">
+                        {isMagazine ? (
+                          <p className="block text-[15px] font-semibold leading-snug tracking-tight text-ink">
+                            {item.name}
+                          </p>
+                        ) : (
+                          <Link
+                            href={`/product/${item.slug}`}
+                            className="block text-[15px] font-semibold leading-snug tracking-tight text-ink hover:underline"
+                          >
+                            {item.name}
+                          </Link>
+                        )}
                         <p className="mt-1 text-sm text-ink-muted">{variant}</p>
+                        {isMagazine && item.magazine ? (
+                          <p className="mt-1 text-xs text-ink-soft">
+                            Full {formatPrice(item.magazine.fullPrice)} · Balance{" "}
+                            {formatPrice(item.magazine.balance)} after delivery
+                          </p>
+                        ) : null}
 
                         <div className="mt-4 flex items-end justify-between gap-3">
-                          <div className="inline-flex items-center rounded-full bg-[#f0f0f0]">
-                            <button
-                              type="button"
-                              className="flex size-8 items-center justify-center text-ink-soft transition-transform active:scale-95"
-                              onClick={() =>
-                                setQuantity(item.slug, item.quantity - 1)
-                              }
-                              aria-label="Decrease"
-                            >
-                              −
-                            </button>
-                            <span className="min-w-6 text-center text-sm font-semibold">
-                              {item.quantity}
+                          {isMagazine ? (
+                            <span className="rounded-full bg-[#f0f0f0] px-3 py-1.5 text-xs font-medium text-ink-soft">
+                              Qty 1
                             </span>
-                            <button
-                              type="button"
-                              className="flex size-8 items-center justify-center text-ink-soft transition-transform active:scale-95"
-                              onClick={() =>
-                                setQuantity(item.slug, item.quantity + 1)
-                              }
-                              aria-label="Increase"
-                            >
-                              +
-                            </button>
-                          </div>
+                          ) : (
+                            <div className="inline-flex items-center rounded-full bg-[#f0f0f0]">
+                              <button
+                                type="button"
+                                className="flex size-8 items-center justify-center text-ink-soft transition-transform active:scale-95"
+                                onClick={() =>
+                                  setQuantity(item.slug, item.quantity - 1)
+                                }
+                                aria-label="Decrease"
+                              >
+                                −
+                              </button>
+                              <span className="min-w-6 text-center text-sm font-semibold">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="flex size-8 items-center justify-center text-ink-soft transition-transform active:scale-95"
+                                onClick={() =>
+                                  setQuantity(item.slug, item.quantity + 1)
+                                }
+                                aria-label="Increase"
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
                           <p className="text-[15px] font-semibold">
                             {formatPrice(item.price * item.quantity)}
+                            {isMagazine ? (
+                              <span className="block text-right text-xs font-normal text-ink-muted">
+                                due now
+                              </span>
+                            ) : null}
                           </p>
                         </div>
                       </div>
@@ -238,6 +278,8 @@ export default function CartPage() {
                   subtotal={subtotal}
                   discount={discount}
                   total={total}
+                  magazineBalanceDue={magazineBalanceDue}
+                  hasMagazineDeposit={hasMagazineDeposit}
                 />
                 <Link
                   href="/checkout"
@@ -257,6 +299,8 @@ export default function CartPage() {
                 subtotal={subtotal}
                 discount={discount}
                 total={total}
+                magazineBalanceDue={magazineBalanceDue}
+                hasMagazineDeposit={hasMagazineDeposit}
               />
             </div>
           </div>
@@ -285,15 +329,21 @@ function SummaryBlock({
   subtotal,
   discount,
   total,
+  magazineBalanceDue = 0,
+  hasMagazineDeposit = false,
 }: {
   subtotal: number;
   discount: number;
   total: number;
+  magazineBalanceDue?: number;
+  hasMagazineDeposit?: boolean;
 }) {
   return (
     <dl className="flex flex-col gap-3 text-[15px]">
       <div className="flex justify-between gap-4">
-        <dt className="text-ink-soft">Subtotal</dt>
+        <dt className="text-ink-soft">
+          {hasMagazineDeposit ? "Due today" : "Subtotal"}
+        </dt>
         <dd className="font-semibold">{formatPrice(subtotal)}</dd>
       </div>
       {discount > 0 ? (
@@ -304,12 +354,22 @@ function SummaryBlock({
           </dd>
         </div>
       ) : null}
+      {magazineBalanceDue > 0 ? (
+        <div className="flex justify-between gap-4">
+          <dt className="text-ink-soft">Magazine balance (after delivery)</dt>
+          <dd className="font-semibold text-ink-soft">
+            {formatPrice(magazineBalanceDue)}
+          </dd>
+        </div>
+      ) : null}
       <div className="flex justify-between gap-4">
         <dt className="text-ink-soft">Shipping</dt>
         <dd className="text-ink-soft">Calculated at checkout</dd>
       </div>
       <div className="flex justify-between gap-4 border-t border-line pt-3">
-        <dt className="font-semibold">Total</dt>
+        <dt className="font-semibold">
+          {hasMagazineDeposit ? "Pay now" : "Total"}
+        </dt>
         <dd className="font-semibold">{formatPrice(total)}</dd>
       </div>
     </dl>

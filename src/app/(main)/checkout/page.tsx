@@ -18,7 +18,8 @@ const steps = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, count, subtotal, clear } = useCart();
+  const { items, count, subtotal, clear, magazineBalanceDue, hasMagazineDeposit } =
+    useCart();
   const [step, setStep] = useState<Step>(1);
   const [delivery, setDelivery] = useState<"standard" | "express">("standard");
   const [payment, setPayment] = useState<"card" | "transfer" | "new">("card");
@@ -308,6 +309,8 @@ export default function CheckoutPage() {
                     shippingFee={shippingFee}
                     total={total}
                     className="mt-4"
+                    magazineBalanceDue={magazineBalanceDue}
+                    hasMagazineDeposit={hasMagazineDeposit}
                   />
                 </div>
               ) : null}
@@ -328,6 +331,8 @@ export default function CheckoutPage() {
                 shippingFee={shippingFee}
                 total={total}
                 className="mt-5 border-t border-line pt-5"
+                magazineBalanceDue={magazineBalanceDue}
+                hasMagazineDeposit={hasMagazineDeposit}
               />
               {step < 3 ? (
                 <button
@@ -471,7 +476,15 @@ function PaymentOption({
 function OrderLines({
   items,
 }: {
-  items: { slug: string; name: string; image: string; price: number; quantity: number }[];
+  items: {
+    slug: string;
+    name: string;
+    image: string;
+    price: number;
+    quantity: number;
+    kind?: "product" | "magazine";
+    magazine?: { pages: number; balance: number };
+  }[];
 }) {
   return (
     <ul className="flex flex-col gap-3">
@@ -492,7 +505,16 @@ function OrderLines({
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{item.name}</p>
-            <p className="text-sm text-ink-soft">{formatPrice(item.price)}</p>
+            <p className="text-sm text-ink-soft">
+              {formatPrice(item.price)}
+              {item.kind === "magazine" ? " deposit" : ""}
+            </p>
+            {item.magazine ? (
+              <p className="text-xs text-ink-muted">
+                {item.magazine.pages} pages · balance{" "}
+                {formatPrice(item.magazine.balance)} later
+              </p>
+            ) : null}
           </div>
         </li>
       ))}
@@ -505,18 +527,32 @@ function Totals({
   shippingFee,
   total,
   className,
+  magazineBalanceDue = 0,
+  hasMagazineDeposit = false,
 }: {
   subtotal: number;
   shippingFee: number;
   total: number;
   className?: string;
+  magazineBalanceDue?: number;
+  hasMagazineDeposit?: boolean;
 }) {
   return (
     <dl className={cn("flex flex-col gap-2.5 text-[15px]", className)}>
       <div className="flex justify-between gap-4">
-        <dt className="text-ink-soft">Subtotal</dt>
+        <dt className="text-ink-soft">
+          {hasMagazineDeposit ? "Due today (incl. deposits)" : "Subtotal"}
+        </dt>
         <dd className="font-medium">{formatPrice(subtotal)}</dd>
       </div>
+      {magazineBalanceDue > 0 ? (
+        <div className="flex justify-between gap-4">
+          <dt className="text-ink-soft">Magazine balance after delivery</dt>
+          <dd className="font-medium text-ink-soft">
+            {formatPrice(magazineBalanceDue)}
+          </dd>
+        </div>
+      ) : null}
       <div className="flex justify-between gap-4">
         <dt className="text-ink-soft">Shipping</dt>
         <dd className="font-medium">
@@ -524,7 +560,9 @@ function Totals({
         </dd>
       </div>
       <div className="flex justify-between gap-4 pt-1">
-        <dt className="font-semibold">Total</dt>
+        <dt className="font-semibold">
+          {hasMagazineDeposit ? "Pay now" : "Total"}
+        </dt>
         <dd className="font-semibold">{formatPrice(total)}</dd>
       </div>
     </dl>
