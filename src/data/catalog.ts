@@ -38,6 +38,8 @@ export const products: Product[] = [
       "/products/lum-parfum.png",
       "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80",
       "https://images.unsplash.com/photo-1588405748880-12d1d2a59db9?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80",
     ],
   },
   {

@@ -15,10 +15,10 @@ const company = [
 ];
 
 const account = [
+  { href: "/account", label: "My account" },
   { href: "/login", label: "Sign in" },
   { href: "/signup", label: "Create account" },
-  { href: "/forgot-password", label: "Forgot password" },
-  { href: "/verify-email", label: "Verify email" },
+  { href: "/account/orders", label: "Orders" },
 ];
 
 const legal = [

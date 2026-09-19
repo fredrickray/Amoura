@@ -8,6 +8,7 @@ export function AuthInput({
   autoComplete,
   required,
   className,
+  defaultValue,
 }: {
   id: string;
   label: string;
@@ -16,6 +17,7 @@ export function AuthInput({
   autoComplete?: string;
   required?: boolean;
   className?: string;
+  defaultValue?: string;
 }) {
   return (
     <label className={cn("flex flex-col gap-2", className)} htmlFor={id}>
@@ -27,6 +29,7 @@ export function AuthInput({
         placeholder={placeholder}
         autoComplete={autoComplete}
         required={required}
+        defaultValue={defaultValue}
         className="h-12 rounded-full border border-line bg-surface px-5 text-[15px] text-ink outline-none transition-[border-color,box-shadow] duration-200 ease-[var(--ease-out-strong)] placeholder:text-ink-muted focus:border-ink/40 focus:shadow-[0_0_0_4px_rgba(17,17,17,0.06)]"
       />
     </label>
@@ -71,11 +74,16 @@ export function AuthDivider({ label = "or continue with" }: { label?: string }) 
   );
 }
 
-export function AuthSocialButtons() {
+export function AuthSocialButtons({
+  onContinue,
+}: {
+  onContinue?: () => void;
+}) {
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
         type="button"
+        onClick={onContinue}
         className="flex h-12 cursor-hover items-center justify-center gap-2 rounded-full border border-line bg-surface text-sm font-medium transition-colors duration-200 hover:bg-surface-soft active:scale-[0.98]"
       >
         <GoogleIcon />
@@ -83,6 +91,7 @@ export function AuthSocialButtons() {
       </button>
       <button
         type="button"
+        onClick={onContinue}
         className="flex h-12 cursor-hover items-center justify-center gap-2 rounded-full border border-line bg-surface text-sm font-medium transition-colors duration-200 hover:bg-surface-soft active:scale-[0.98]"
       >
         <AppleIcon />
