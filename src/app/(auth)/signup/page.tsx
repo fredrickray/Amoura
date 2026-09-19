@@ -17,7 +17,7 @@ export default function SignupPage() {
     <AuthShell
       title="Create your account"
       subtitle="Join Amoura for perfumes, custom magazines, and lash studio bookings."
-      imageSrc="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1400&q=80"
+      imageSrc="/products/hydra-balm.png"
       imageAlt="Beauty atelier atmosphere"
       imageCaption="Start with a scent, a story, or a set — your beauty ritual begins here."
     >
