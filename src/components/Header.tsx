@@ -75,8 +75,17 @@ export function Header() {
           })}
         </nav>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <PillButton href="/store" className="hidden sm:inline-flex" arrow>
+        <div className="relative z-10 flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/login"
+            className="hidden text-[15px] text-ink-soft transition-colors hover:text-ink sm:inline"
+          >
+            Sign in
+          </Link>
+          <PillButton href="/signup" className="hidden sm:inline-flex" arrow>
+            Join
+          </PillButton>
+          <PillButton href="/store" className="hidden md:inline-flex" arrow>
             Shop
           </PillButton>
           <button
@@ -121,7 +130,16 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <PillButton href="/store" className="mt-2 w-full" arrow>
+          <Link
+            href="/login"
+            className="rounded-xl px-3 py-3 text-[15px] text-ink-soft hover:bg-surface-soft hover:text-ink"
+          >
+            Sign in
+          </Link>
+          <PillButton href="/signup" className="mt-2 w-full" arrow>
+            Join
+          </PillButton>
+          <PillButton href="/store" className="w-full" arrow>
             Shop
           </PillButton>
         </div>
