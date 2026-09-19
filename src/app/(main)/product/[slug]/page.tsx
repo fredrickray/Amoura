@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ProductDetail } from "@/components/ProductDetail";
 import { getProduct, products } from "@/data/catalog";
 
 export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+  return products
+    .filter((p) => p.catalogue !== "magazine")
+    .map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({
@@ -14,7 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = getProduct(slug);
-  if (!product) return { title: "Product" };
+  if (!product || product.catalogue === "magazine") {
+    return { title: "Custom Magazines" };
+  }
   return {
     title: product.name,
     description: product.description,
@@ -29,5 +33,6 @@ export default async function ProductPage({
   const { slug } = await params;
   const product = getProduct(slug);
   if (!product) notFound();
+  if (product.catalogue === "magazine") redirect("/magazines");
   return <ProductDetail product={product} />;
 }
