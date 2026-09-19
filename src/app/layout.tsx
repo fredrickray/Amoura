@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Great_Vibes, Instrument_Serif, Manrope } from "next/font/google";
 import { CustomCursor } from "@/components/CustomCursor";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -49,9 +47,7 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-manrope), Helvetica Neue, Arial, sans-serif" }}
       >
         <CustomCursor />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
