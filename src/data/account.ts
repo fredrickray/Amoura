@@ -309,3 +309,145 @@ export function getReviewsForProduct(slug: string) {
     productSlug: slug,
   }));
 }
+
+export type MagazineProjectStatus =
+  | "draft"
+  | "in_review"
+  | "changes_requested"
+  | "approved"
+  | "printed";
+
+export type MagazineTimelineStep = {
+  label: string;
+  detail: string;
+  done: boolean;
+  current?: boolean;
+};
+
+export type MagazineProject = {
+  id: string;
+  title: string;
+  theme: string;
+  status: MagazineProjectStatus;
+  updatedAt: string;
+  pages: number;
+  coverImage: string;
+  proofImages: string[];
+  brief: string;
+  editorNote?: string;
+  price: number;
+  timeline: MagazineTimelineStep[];
+  photosUploaded: number;
+  photosNeeded: number;
+};
+
+export const magazineStatusLabel: Record<MagazineProjectStatus, string> = {
+  draft: "Draft",
+  in_review: "In review",
+  changes_requested: "Changes requested",
+  approved: "Approved",
+  printed: "Printed",
+};
+
+export const magazineProjects: MagazineProject[] = [
+  {
+    id: "MAG-318",
+    title: "Ada & Kelechi — Engagement Edit",
+    theme: "Love story / editorial",
+    status: "in_review",
+    updatedAt: "18 Sep 2026",
+    pages: 96,
+    coverImage:
+      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=900&q=80",
+    proofImages: [
+      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=900&q=80",
+    ],
+    brief:
+      "Soft blush palette, Lagos engagement weekend, mix of candid and portrait. Prefer serif headlines and generous white space.",
+    editorNote:
+      "Proof v2 is ready. Cover crop tightened; pages 12–15 reflowed after your photo swap.",
+    price: 45000,
+    photosUploaded: 48,
+    photosNeeded: 40,
+    timeline: [
+      { label: "Brief submitted", detail: "4 Sep · 6:20 PM", done: true },
+      { label: "Photos uploaded", detail: "6 Sep · 48 images", done: true },
+      { label: "First layout", detail: "12 Sep", done: true },
+      {
+        label: "Proof in review",
+        detail: "Awaiting your approval",
+        done: true,
+        current: true,
+      },
+      { label: "Approved to print", detail: "Pending", done: false },
+      { label: "Printed & shipped", detail: "Pending", done: false },
+    ],
+  },
+  {
+    id: "MAG-291",
+    title: "Private Issue — Brand Launch",
+    theme: "Lifestyle / product story",
+    status: "draft",
+    updatedAt: "10 Sep 2026",
+    pages: 64,
+    coverImage:
+      "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=900&q=80",
+    proofImages: [
+      "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1481627834876-b7833e1d6431?auto=format&fit=crop&w=900&q=80",
+    ],
+    brief:
+      "Launch keepsake for a skincare drop — matte paper, quiet typography, product flat-lays + founder note.",
+    price: 55000,
+    photosUploaded: 12,
+    photosNeeded: 35,
+    timeline: [
+      { label: "Brief started", detail: "10 Sep", done: true, current: true },
+      { label: "Photos uploaded", detail: "12 of 35", done: false },
+      { label: "First layout", detail: "Pending", done: false },
+      { label: "Proof in review", detail: "Pending", done: false },
+      { label: "Approved to print", detail: "Pending", done: false },
+      { label: "Printed & shipped", detail: "Pending", done: false },
+    ],
+  },
+  {
+    id: "MAG-244",
+    title: "Amoura Edit Vol. II — Family Album",
+    theme: "Family / milestone",
+    status: "printed",
+    updatedAt: "22 Jul 2026",
+    pages: 120,
+    coverImage:
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80",
+    proofImages: [
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=900&q=80",
+    ],
+    brief: "Three generations, Christmas in Enugu — warm tones, caption space for handwritten notes.",
+    editorNote: "Shipped 22 Jul. Tracking was attached to order AMO-10102.",
+    price: 62000,
+    photosUploaded: 76,
+    photosNeeded: 60,
+    timeline: [
+      { label: "Brief submitted", detail: "2 Jun", done: true },
+      { label: "Photos uploaded", detail: "8 Jun", done: true },
+      { label: "First layout", detail: "18 Jun", done: true },
+      { label: "Proof approved", detail: "28 Jun", done: true },
+      { label: "Printed", detail: "10 Jul", done: true },
+      {
+        label: "Shipped",
+        detail: "22 Jul · Delivered",
+        done: true,
+        current: true,
+      },
+    ],
+  },
+];
+
+export function getMagazineProject(id: string) {
+  return magazineProjects.find((p) => p.id === id);
+}
