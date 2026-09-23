@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { customer } from "@/data/account";
+import { useAuth } from "@/context/AuthContext";
 
 const nav = [
   { href: "/account", label: "Home", exact: true },
@@ -19,7 +19,17 @@ const nav = [
 
 export function AccountShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const initials = `${customer.firstName[0]}${customer.lastName[0]}`;
+  const router = useRouter();
+  const { user, logout, isAdmin } = useAuth();
+  const firstName = user?.firstName ?? "Guest";
+  const lastName = user?.lastName ?? "";
+  const email = user?.email ?? "";
+  const initials = `${firstName[0] ?? "G"}${lastName[0] ?? ""}`.toUpperCase();
+
+  function signOut() {
+    logout();
+    router.push("/login");
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-canvas">
@@ -58,6 +68,14 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-4">
+            {isAdmin ? (
+              <Link
+                href="/admin"
+                className="hidden text-sm text-ink-soft transition-colors hover:text-ink sm:inline"
+              >
+                Studio desk
+              </Link>
+            ) : null}
             <Link
               href="/account/notifications"
               aria-label="Notifications"
@@ -85,12 +103,13 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
             >
               Continue shopping
             </Link>
-            <Link
-              href="/login"
+            <button
+              type="button"
+              onClick={signOut}
               className="text-sm font-medium text-ink-soft transition-colors hover:text-ink"
             >
               Sign out
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -104,9 +123,9 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
               </div>
               <div className="min-w-0">
                 <p className="truncate font-medium text-ink">
-                  {customer.firstName} {customer.lastName}
+                  {firstName} {lastName}
                 </p>
-                <p className="truncate text-sm text-ink-soft">{customer.email}</p>
+                <p className="truncate text-sm text-ink-soft">{email}</p>
               </div>
             </div>
 

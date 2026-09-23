@@ -1,14 +1,12 @@
-import type { Metadata } from "next";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
   appointmentStatusLabel,
   appointments,
-  customer,
-  magazineProjects,
   magazineStatusLabel,
   orderStatusLabel,
-  orders,
 } from "@/data/account";
 import {
   StatusPill,
@@ -17,11 +15,9 @@ import {
   orderTone,
 } from "@/components/account/StatusPill";
 import { PillButton } from "@/components/PillButton";
+import { useAccountData } from "@/context/AccountDataContext";
+import { useAuth } from "@/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
-
-export const metadata: Metadata = {
-  title: "Account",
-};
 
 const quickActions = [
   {
@@ -46,9 +42,16 @@ const quickActions = [
 ];
 
 export default function AccountHomePage() {
+  const { user } = useAuth();
+  const { orders, magazines, ready } = useAccountData();
   const latestOrder = orders[0];
   const nextAppointment = appointments.find((a) => a.status === "upcoming");
-  const activeMagazine = magazineProjects.find((p) => p.status !== "printed");
+  const activeMagazine = magazines.find((p) => p.status !== "printed");
+  const firstName = user?.firstName ?? "there";
+
+  if (!ready) {
+    return <p className="text-sm text-ink-soft">Loading account…</p>;
+  }
 
   return (
     <div>
@@ -63,7 +66,7 @@ export default function AccountHomePage() {
         />
         <p className="badge mb-3">Account</p>
         <h1 className="relative max-w-xl font-display text-[clamp(2.1rem,4.5vw,3.25rem)] leading-[1.05] tracking-[-0.03em]">
-          Welcome back, {customer.firstName}
+          Welcome back, {firstName}
         </h1>
         <p className="relative mt-3 max-w-lg text-[15px] leading-relaxed text-ink-soft">
           Your atelier desk — orders in motion, lash bookings ahead, and a few
@@ -140,7 +143,10 @@ export default function AccountHomePage() {
                     fill
                     className="object-contain p-2"
                     sizes="80px"
-                    unoptimized={latestOrder.items[0].image.startsWith("/")}
+                unoptimized={
+                  latestOrder.items[0].image.startsWith("/") ||
+                  latestOrder.items[0].image.startsWith("blob:")
+                }
                   />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -248,7 +254,10 @@ export default function AccountHomePage() {
                 fill
                 className="object-cover"
                 sizes="144px"
-                unoptimized={activeMagazine.coverImage.startsWith("/")}
+                unoptimized={
+                  activeMagazine.coverImage.startsWith("/") ||
+                  activeMagazine.coverImage.startsWith("blob:")
+                }
               />
             </div>
             <div className="min-w-0 flex-1">

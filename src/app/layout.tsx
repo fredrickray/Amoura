@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Great_Vibes, Instrument_Serif, Manrope } from "next/font/google";
 import { CustomCursor } from "@/components/CustomCursor";
+import { AccountDataProvider } from "@/context/AccountDataContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import "./globals.css";
@@ -55,12 +57,16 @@ export default function RootLayout({
         className="min-h-screen bg-canvas antialiased"
         style={{ fontFamily: "var(--font-manrope), Helvetica Neue, Arial, sans-serif" }}
       >
-        <CartProvider>
-          <WishlistProvider>
-            <CustomCursor />
-            {children}
-          </WishlistProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <AccountDataProvider>
+                <CustomCursor />
+                {children}
+              </AccountDataProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

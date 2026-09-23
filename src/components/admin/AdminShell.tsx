@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "amoura-admin-sidebar-collapsed";
@@ -140,6 +141,8 @@ function isActive(pathname: string, item: NavItem) {
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -275,10 +278,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ) : (
             <>
               <p className="text-xs text-white/40">Signed in as</p>
-              <p className="mt-0.5 text-sm font-medium text-white/85">Studio admin</p>
+              <p className="mt-0.5 text-sm font-medium text-white/85">
+                Studio admin
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  router.push("/login");
+                }}
+                className="mt-3 block text-xs text-[#e8d4d7]/70 transition-colors hover:text-[#e8d4d7]"
+              >
+                Sign out
+              </button>
               <Link
                 href="/"
-                className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#e8d4d7]/70 transition-colors hover:text-[#e8d4d7]"
+                className="mt-2 inline-flex items-center gap-1.5 text-xs text-[#e8d4d7]/70 transition-colors hover:text-[#e8d4d7]"
               >
                 <StorefrontIcon className="size-3.5" />
                 View storefront

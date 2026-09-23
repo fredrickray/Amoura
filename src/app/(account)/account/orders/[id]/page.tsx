@@ -1,37 +1,37 @@
-import type { Metadata } from "next";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import {
-  getOrder,
-  orderStatusLabel,
-  orders,
-} from "@/data/account";
+import { use } from "react";
 import { StatusPill, orderTone } from "@/components/account/StatusPill";
 import { PillButton } from "@/components/PillButton";
+import { useAccountData } from "@/context/AccountDataContext";
+import { orderStatusLabel } from "@/data/account";
 import { cn, formatPrice } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return orders.map((order) => ({ id: order.id }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id } = await params;
-  return { title: `Order ${id}` };
-}
-
-export default async function OrderDetailPage({
+export default function OrderDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id } = use(params);
+  const { getOrder, ready } = useAccountData();
   const order = getOrder(id);
-  if (!order) notFound();
+
+  if (!ready) {
+    return <p className="text-sm text-ink-soft">Loading order…</p>;
+  }
+
+  if (!order) {
+    return (
+      <div>
+        <p className="font-display text-2xl">Order not found</p>
+        <Link href="/account/orders" className="mt-4 inline-block text-sm text-ink-soft">
+          ← Back to orders
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-w-0">
@@ -66,7 +66,7 @@ export default async function OrderDetailPage({
           <ul className="mt-5 flex flex-col gap-4">
             {order.items.map((item) => (
               <li
-                key={item.name}
+                key={`${item.productSlug}-${item.name}`}
                 className="flex min-w-0 items-center gap-4 border-b border-line pb-4 last:border-b-0 last:pb-0"
               >
                 <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-surface-soft">
@@ -76,7 +76,9 @@ export default async function OrderDetailPage({
                     fill
                     className="object-contain p-1.5"
                     sizes="64px"
-                    unoptimized={item.image.startsWith("/")}
+                    unoptimized={
+                      item.image.startsWith("/") || item.image.startsWith("blob:")
+                    }
                   />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -84,12 +86,14 @@ export default async function OrderDetailPage({
                   <p className="text-sm text-ink-soft">
                     {item.catalogue} · Qty {item.quantity}
                   </p>
-                  <Link
-                    href={`/product/${item.productSlug}`}
-                    className="mt-1 inline-block text-sm font-medium text-blush-deep underline-offset-2 hover:underline"
-                  >
-                    View product
-                  </Link>
+                  {!item.productSlug.startsWith("magazine-") ? (
+                    <Link
+                      href={`/product/${item.productSlug}`}
+                      className="mt-1 inline-block text-sm font-medium text-blush-deep underline-offset-2 hover:underline"
+                    >
+                      View product
+                    </Link>
+                  ) : null}
                 </div>
                 <p className="shrink-0 text-sm font-medium">
                   {formatPrice(item.price)}
@@ -122,7 +126,7 @@ export default async function OrderDetailPage({
             <ol className="relative mt-6">
               {order.timeline.map((step, index) => (
                 <li
-                  key={step.label}
+                  key={`${step.label}-${index}`}
                   className="relative flex gap-4 pb-6 last:pb-0"
                 >
                   {index < order.timeline.length - 1 ? (

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAccountData } from "@/context/AccountDataContext";
+import { useAuth } from "@/context/AuthContext";
 import { customer } from "@/data/account";
 import { cn, formatPrice } from "@/lib/utils";
 
@@ -18,15 +20,25 @@ const steps = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, count, subtotal, clear, magazineBalanceDue, hasMagazineDeposit } =
-    useCart();
+  const {
+    items,
+    count,
+    subtotal,
+    clear,
+    magazineBalanceDue,
+    hasMagazineDeposit,
+  } = useCart();
+  const { placeCheckout } = useAccountData();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>(1);
   const [delivery, setDelivery] = useState<"standard" | "express">("standard");
   const [payment, setPayment] = useState<"card" | "transfer" | "new">("card");
   const [summaryOpen, setSummaryOpen] = useState(true);
   const [editingAddress, setEditingAddress] = useState(false);
   const [address, setAddress] = useState({
-    name: `${customer.firstName} ${customer.lastName}`,
+    name: user
+      ? `${user.firstName} ${user.lastName}`
+      : `${customer.firstName} ${customer.lastName}`,
     line1: "14 Admiralty Way",
     line2: "Lekki Phase 1",
     city: "Lagos",
@@ -59,8 +71,27 @@ export default function CheckoutPage() {
   }
 
   function placeOrder() {
+    const shippingAddress = [
+      address.name,
+      address.line1,
+      address.line2,
+      address.city,
+      address.country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const { orderId, magazineIds } = placeCheckout({
+      items,
+      shippingAddress,
+      shippingFee,
+    });
     clear();
-    router.push("/account/orders");
+    if (magazineIds.length > 0 && items.every((i) => i.kind === "magazine")) {
+      router.push(`/account/magazines/${magazineIds[0]}`);
+    } else {
+      router.push(`/account/orders/${orderId}`);
+    }
   }
 
   return (

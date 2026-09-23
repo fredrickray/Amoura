@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { RequireAdmin } from "@/components/auth/RequireAuth";
 import { AdminStoreProvider } from "@/context/AdminStoreContext";
 
 export const metadata: Metadata = {
@@ -16,8 +17,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AdminStoreProvider>
-      <AdminShell>{children}</AdminShell>
-    </AdminStoreProvider>
+    <RequireAdmin>
+      <AdminStoreProvider>
+        <AdminShell>{children}</AdminShell>
+      </AdminStoreProvider>
+    </RequireAdmin>
   );
 }

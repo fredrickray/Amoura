@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import {
   AuthDivider,
   AuthInput,
@@ -10,10 +10,34 @@ import {
   AuthSubmit,
 } from "@/components/auth/AuthForm";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { getAuthErrorMessage, useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+    const form = new FormData(e.currentTarget);
+    try {
+      await register({
+        firstName: String(form.get("firstName") || "").trim(),
+        lastName: String(form.get("lastName") || "").trim(),
+        email: String(form.get("email") || "").trim(),
+        password: String(form.get("password") || ""),
+      });
+      router.push("/account");
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <AuthShell
@@ -23,13 +47,7 @@ export default function SignupPage() {
       imageAlt="Beauty atelier atmosphere"
       imageCaption="Start with a scent, a story, or a set — your beauty ritual begins here."
     >
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          router.push("/account");
-        }}
-      >
+      <form className="flex flex-col gap-4" onSubmit={onSubmit}>
         <div className="grid gap-4 sm:grid-cols-2">
           <AuthInput
             id="firstName"
@@ -74,6 +92,12 @@ export default function SignupPage() {
           </button>
         </div>
 
+        {error ? (
+          <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800">
+            {error}
+          </p>
+        ) : null}
+
         <label className="flex cursor-pointer items-start gap-2.5 pt-1 text-sm leading-relaxed text-ink-soft">
           <input
             type="checkbox"
@@ -94,12 +118,17 @@ export default function SignupPage() {
           </span>
         </label>
 
-        <AuthSubmit>Create account</AuthSubmit>
+        <AuthSubmit disabled={pending}>
+          {pending ? "Creating account…" : "Create account"}
+        </AuthSubmit>
       </form>
 
       <div className="mt-6 flex flex-col gap-4">
         <AuthDivider />
-        <AuthSocialButtons onContinue={() => router.push("/account")} />
+        <AuthSocialButtons />
+        <p className="text-center text-xs text-ink-muted">
+          Social sign-in coming soon — use email for now.
+        </p>
       </div>
 
       <p className="mt-8 text-center text-sm text-ink-soft">
