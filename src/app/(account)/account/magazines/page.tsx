@@ -1,21 +1,22 @@
-import type { Metadata } from "next";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import {
-  magazineProjects,
-  magazineStatusLabel,
-} from "@/data/account";
 import { StatusPill, magazineTone } from "@/components/account/StatusPill";
 import { PillButton } from "@/components/PillButton";
+import { useAccountData } from "@/context/AccountDataContext";
+import { magazineStatusLabel, type MagazineProject } from "@/data/account";
 import { formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Magazine projects",
-};
-
 export default function MagazineProjectsPage() {
-  const active = magazineProjects.filter((p) => p.status !== "printed");
-  const archived = magazineProjects.filter((p) => p.status === "printed");
+  const { magazines, ready } = useAccountData();
+
+  if (!ready) {
+    return <p className="text-sm text-ink-soft">Loading projects…</p>;
+  }
+
+  const active = magazines.filter((p) => p.status !== "printed");
+  const archived = magazines.filter((p) => p.status === "printed");
 
   return (
     <div className="min-w-0">
@@ -27,7 +28,7 @@ export default function MagazineProjectsPage() {
           </h1>
           <p className="mt-2 max-w-lg text-[15px] text-ink-soft">
             Drafts, proofs awaiting approval, and printed keepsakes — all in one
-            place.
+            place. New commissions from checkout appear here.
           </p>
         </div>
         <PillButton href="/magazines" variant="solid">
@@ -46,7 +47,7 @@ export default function MagazineProjectsPage() {
         ) : (
           <div className="flex flex-col gap-4">
             {active.map((project) => (
-              <ProjectCard key={project.id} id={project.id} />
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         )}
@@ -58,7 +59,7 @@ export default function MagazineProjectsPage() {
         </h2>
         <div className="flex flex-col gap-4">
           {archived.map((project) => (
-            <ProjectCard key={project.id} id={project.id} />
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       </section>
@@ -66,8 +67,7 @@ export default function MagazineProjectsPage() {
   );
 }
 
-function ProjectCard({ id }: { id: string }) {
-  const project = magazineProjects.find((p) => p.id === id)!;
+function ProjectCard({ project }: { project: MagazineProject }) {
   return (
     <Link
       href={`/account/magazines/${project.id}`}
@@ -80,7 +80,7 @@ function ProjectCard({ id }: { id: string }) {
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="160px"
-          unoptimized={project.coverImage.startsWith("/")}
+          unoptimized={project.coverImage.startsWith("/") || project.coverImage.startsWith("blob:")}
         />
       </div>
       <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">

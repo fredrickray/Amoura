@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { orders, orderStatusLabel } from "@/data/account";
 import { StatusPill, orderTone } from "@/components/account/StatusPill";
+import { useAccountData } from "@/context/AccountDataContext";
+import { orderStatusLabel } from "@/data/account";
 import { formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Orders",
-};
-
 export default function OrdersPage() {
+  const { orders, ready } = useAccountData();
+
+  if (!ready) {
+    return <p className="text-sm text-ink-soft">Loading orders…</p>;
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -32,12 +36,15 @@ export default function OrdersPage() {
             <div className="grid md:grid-cols-[140px_1fr]">
               <div className="relative min-h-[120px] bg-gradient-to-b from-[#f0e6e8] to-[#e4d5d8] md:min-h-full">
                 <Image
-                  src={order.items[0].image}
+                  src={order.items[0]?.image ?? "/products/lum-parfum.png"}
                   alt=""
                   fill
                   className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
                   sizes="140px"
-                  unoptimized={order.items[0].image.startsWith("/")}
+                  unoptimized={
+                    (order.items[0]?.image ?? "").startsWith("/") ||
+                    (order.items[0]?.image ?? "").startsWith("blob:")
+                  }
                 />
               </div>
               <div className="p-5 md:p-6">
@@ -65,7 +72,7 @@ export default function OrdersPage() {
                   <div className="mt-4 flex gap-2">
                     {order.items.slice(1).map((item) => (
                       <div
-                        key={item.name}
+                        key={`${item.productSlug}-${item.name}`}
                         className="relative size-12 overflow-hidden rounded-xl bg-[#efe6e8]"
                       >
                         <Image
@@ -74,7 +81,10 @@ export default function OrdersPage() {
                           fill
                           className="object-contain p-1.5"
                           sizes="48px"
-                          unoptimized={item.image.startsWith("/")}
+                          unoptimized={
+                            item.image.startsWith("/") ||
+                            item.image.startsWith("blob:")
+                          }
                         />
                       </div>
                     ))}

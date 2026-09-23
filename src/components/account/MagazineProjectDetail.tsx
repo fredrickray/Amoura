@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   magazineStatusLabel,
@@ -10,28 +10,56 @@ import {
   type MagazineProjectStatus,
 } from "@/data/account";
 import { StatusPill, magazineTone } from "@/components/account/StatusPill";
+import { useAccountData } from "@/context/AccountDataContext";
 import { cn, formatPrice } from "@/lib/utils";
 
-export function MagazineProjectDetail({
-  project: initial,
-}: {
-  project: MagazineProject;
-}) {
-  const [project, setProject] = useState(initial);
+export function MagazineProjectDetail({ projectId }: { projectId: string }) {
+  const { getMagazine, updateMagazineStatus, payMagazineBalance, ready } =
+    useAccountData();
+  const stored = getMagazine(projectId);
+  const [project, setProject] = useState<MagazineProject | null>(stored ?? null);
   const [proofIndex, setProofIndex] = useState(0);
   const [changeNote, setChangeNote] = useState("");
   const [showChanges, setShowChanges] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (stored) setProject(stored);
+  }, [stored]);
+
   const canApprove =
-    project.status === "in_review" || project.status === "changes_requested";
-  const canRequestChanges = project.status === "in_review";
-  const isDraft = project.status === "draft";
+    project?.status === "in_review" || project?.status === "changes_requested";
+  const canRequestChanges = project?.status === "in_review";
+  const isDraft = project?.status === "draft";
+  const needsBalance = Boolean(
+    project?.timeline.some(
+      (s) => s.label.toLowerCase().includes("balance") && !s.done,
+    ),
+  );
 
   const progress = useMemo(() => {
+    if (!project) return 0;
     const done = project.timeline.filter((s) => s.done).length;
     return Math.round((done / project.timeline.length) * 100);
-  }, [project.timeline]);
+  }, [project]);
+
+  if (!ready) {
+    return <p className="text-sm text-ink-soft">Loading project…</p>;
+  }
+
+  if (!project) {
+    return (
+      <div>
+        <p className="font-display text-2xl">Project not found</p>
+        <Link
+          href="/account/magazines"
+          className="mt-4 inline-block text-sm text-ink-soft"
+        >
+          ← Back to projects
+        </Link>
+      </div>
+    );
+  }
 
   function flash(message: string) {
     setToast(message);
@@ -39,14 +67,20 @@ export function MagazineProjectDetail({
   }
 
   function approveToPrint() {
-    setProject((p) => ({
-      ...p,
-      status: "approved" as MagazineProjectStatus,
+    const next: MagazineProject = {
+      ...project!,
+      status: "approved",
       updatedAt: "Just now",
-      editorNote: "Approved — headed to print. We’ll email tracking when it ships.",
-      timeline: p.timeline.map((step) => {
+      editorNote:
+        "Approved — headed to print. We’ll email tracking when it ships.",
+      timeline: project!.timeline.map((step) => {
         if (step.label.toLowerCase().includes("proof")) {
-          return { ...step, current: false, done: true, detail: "Approved by you" };
+          return {
+            ...step,
+            current: false,
+            done: true,
+            detail: "Approved by you",
+          };
         }
         if (step.label.toLowerCase().includes("approved")) {
           return {
@@ -58,19 +92,22 @@ export function MagazineProjectDetail({
         }
         return { ...step, current: false };
       }),
-    }));
+    };
+    setProject(next);
+    updateMagazineStatus(next.id, next.status, next.editorNote);
     setShowChanges(false);
     flash("Magazine approved for print");
   }
 
   function submitChanges() {
     if (!changeNote.trim()) return;
-    setProject((p) => ({
-      ...p,
+    const note = `Change request received: “${changeNote.trim()}” — editors will revise the proof.`;
+    const next: MagazineProject = {
+      ...project!,
       status: "changes_requested" as MagazineProjectStatus,
       updatedAt: "Just now",
-      editorNote: `Change request received: “${changeNote.trim()}” — editors will revise the proof.`,
-      timeline: p.timeline.map((step) =>
+      editorNote: note,
+      timeline: project!.timeline.map((step) =>
         step.current
           ? {
               ...step,
@@ -79,10 +116,17 @@ export function MagazineProjectDetail({
             }
           : step,
       ),
-    }));
+    };
+    setProject(next);
+    updateMagazineStatus(next.id, next.status, note);
     setChangeNote("");
     setShowChanges(false);
     flash("Change request sent");
+  }
+
+  function payBalance() {
+    payMagazineBalance(project!.id);
+    flash("Balance marked as paid");
   }
 
   return (
@@ -122,6 +166,26 @@ export function MagazineProjectDetail({
         ) : null}
       </AnimatePresence>
 
+      {needsBalance ? (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-amber-200 bg-amber-50 px-4 py-4 md:px-5">
+          <div>
+            <p className="text-sm font-medium text-amber-950">
+              Remaining 50% balance
+            </p>
+            <p className="mt-0.5 text-sm text-amber-900/80">
+              Deposit is paid. Settle the balance before print.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={payBalance}
+            className="pill pill-solid shrink-0 px-5 py-2.5 text-sm"
+          >
+            Pay balance
+          </button>
+        </div>
+      ) : null}
+
       <div className="mb-6 rounded-[22px] border border-line/80 bg-surface/90 p-4 md:p-5">
         <div className="mb-2 flex justify-between gap-3 text-sm">
           <span className="text-ink-soft">Project progress</span>
@@ -136,7 +200,6 @@ export function MagazineProjectDetail({
       </div>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        {/* Proof viewer */}
         <section className="min-w-0 rounded-[24px] border border-line/80 bg-surface/90 p-4 shadow-[0_18px_40px_-32px_rgba(17,17,17,0.35)] md:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="font-display text-2xl tracking-tight">Proof</h2>
@@ -161,7 +224,10 @@ export function MagazineProjectDetail({
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 520px"
-                  unoptimized={project.proofImages[proofIndex].startsWith("/")}
+                  unoptimized={
+                    project.proofImages[proofIndex].startsWith("/") ||
+                    project.proofImages[proofIndex].startsWith("blob:")
+                  }
                   priority
                 />
               </motion.div>
@@ -171,7 +237,7 @@ export function MagazineProjectDetail({
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
             {project.proofImages.map((src, i) => (
               <button
-                key={src}
+                key={`${src}-${i}`}
                 type="button"
                 onClick={() => setProofIndex(i)}
                 aria-label={`View proof ${i + 1}`}
@@ -189,7 +255,7 @@ export function MagazineProjectDetail({
                   fill
                   className="object-cover"
                   sizes="64px"
-                  unoptimized={src.startsWith("/")}
+                  unoptimized={src.startsWith("/") || src.startsWith("blob:")}
                 />
               </button>
             ))}
