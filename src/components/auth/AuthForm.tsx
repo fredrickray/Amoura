@@ -39,15 +39,18 @@ export function AuthInput({
 export function AuthSubmit({
   children,
   className,
+  disabled,
 }: {
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="submit"
+      disabled={disabled}
       className={cn(
-        "pill pill-solid w-full cursor-hover justify-center py-3.5 text-[15px]",
+        "pill pill-solid w-full cursor-hover justify-center py-3.5 text-[15px] disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
     >

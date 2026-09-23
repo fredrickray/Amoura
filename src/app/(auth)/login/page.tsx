@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useState } from "react";
 import {
   AuthDivider,
   AuthInput,
@@ -10,10 +10,35 @@ import {
   AuthSubmit,
 } from "@/components/auth/AuthForm";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { getAuthErrorMessage, useAuth } from "@/context/AuthContext";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") || "");
+    const password = String(form.get("password") || "");
+    try {
+      const user = await login(email, password);
+      const next = searchParams.get("next");
+      if (next) router.push(next);
+      else if (user.role === "ADMIN") router.push("/admin");
+      else router.push("/account");
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <AuthShell
@@ -23,13 +48,7 @@ export default function LoginPage() {
       imageAlt="Amoura perfume bottle"
       imageCaption="Your atelier of scent, story, and lashes — waiting for you."
     >
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          router.push("/account");
-        }}
-      >
+      <form className="flex flex-col gap-4" onSubmit={onSubmit}>
         <AuthInput
           id="email"
           label="Email"
@@ -57,6 +76,12 @@ export default function LoginPage() {
           </button>
         </div>
 
+        {error ? (
+          <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800">
+            {error}
+          </p>
+        ) : null}
+
         <div className="flex items-center justify-between pt-1 text-sm">
           <label className="flex cursor-pointer items-center gap-2 text-ink-soft">
             <input
@@ -74,12 +99,17 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <AuthSubmit>Sign in</AuthSubmit>
+        <AuthSubmit disabled={pending}>
+          {pending ? "Signing in…" : "Sign in"}
+        </AuthSubmit>
       </form>
 
       <div className="mt-6 flex flex-col gap-4">
         <AuthDivider />
-        <AuthSocialButtons onContinue={() => router.push("/account")} />
+        <AuthSocialButtons />
+        <p className="text-center text-xs text-ink-muted">
+          Social sign-in coming soon — use email for now.
+        </p>
       </div>
 
       <p className="mt-8 text-center text-sm text-ink-soft">
@@ -92,5 +122,19 @@ export default function LoginPage() {
         </Link>
       </p>
     </AuthShell>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center text-sm text-ink-soft">
+          Loading…
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
